@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import fetchPlanets from './services/swapi';
 import './App.css';
 
 function App() {
