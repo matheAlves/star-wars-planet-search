@@ -3,7 +3,14 @@ import PlanetsContext from '../context/PlanetsContext';
 import Loading from './Loading';
 
 function Table() {
-  const { data, loading } = useContext(PlanetsContext);
+  const { data, loading, filterByName } = useContext(PlanetsContext);
+  // console.log(filterByName.name);
+
+  function filterName(rawData) {
+    return rawData.filter(
+      (planet) => planet.name.toLowerCase().includes(filterByName.name.toLowerCase()),
+    );
+  }
   return (
     <ul>
       { loading
@@ -28,7 +35,7 @@ function Table() {
               </tr>
             </thead>
             <tbody>
-              {data.map(
+              {filterName(data).map(
                 (planet) => {
                   const {
                     name,
