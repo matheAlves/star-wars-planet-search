@@ -1,25 +1,19 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import PlanetsContext from '../context/PlanetsContext';
 
 function Filters() {
-  const { filterByName, onChangeName, setNewNumericFilter } = useContext(PlanetsContext);
-  const [localSettings, setLocalSettings] = useState({
-    column: 'population',
-    comparison: 'maior que',
-    value: '0',
-  });
-
-  function localOnChange({ target }) {
-    const { name, value } = target;
-    setLocalSettings((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  }
+  const { filterByName,
+    onChangeName,
+    setNewNumericFilter,
+    columnOptions,
+    removeColumnOption,
+    numericFilterLocalSettings,
+    numericFilterOnChange } = useContext(PlanetsContext);
 
   function localOnSubmit(e) {
-    const { column, comparison, value } = localSettings;
+    const { column, comparison, value } = numericFilterLocalSettings;
     e.preventDefault();
+    removeColumnOption(column);
     setNewNumericFilter(({
       column,
       comparison,
@@ -28,7 +22,7 @@ function Filters() {
   }
 
   return (
-    <>
+    <form onSubmit={ localOnSubmit }>
       <input
         name="search-by-name"
         data-testid="name-filter"
@@ -37,46 +31,38 @@ function Filters() {
         type="text"
         onChange={ onChangeName }
       />
-      <form
-        onSubmit={ localOnSubmit }
+      <select
+        name="column"
+        onChange={ numericFilterOnChange }
+        data-testid="column-filter"
+        value={ numericFilterLocalSettings.column }
       >
-        <select
-          name="column"
-          onChange={ localOnChange }
-          data-testid="column-filter"
-          value={ localSettings.column }
-        >
-          <option>population</option>
-          <option>orbital_period</option>
-          <option>diameter</option>
-          <option>rotation_period</option>
-          <option>surface_water</option>
-        </select>
-        <select
-          name="comparison"
-          onChange={ localOnChange }
-          data-testid="comparison-filter"
-          value={ localSettings.comparison }
-        >
-          <option>maior que</option>
-          <option>menor que</option>
-          <option>igual a</option>
-        </select>
-        <input
-          name="value"
-          value={ localSettings.value }
-          onChange={ localOnChange }
-          data-testid="value-filter"
-          type="number"
-        />
-        <button
-          data-testid="button-filter"
-          type="submit"
-        >
-          Filtrar
-        </button>
-      </form>
-    </>
+        {columnOptions.map((option) => <option key={ option }>{option}</option>)}
+      </select>
+      <select
+        name="comparison"
+        onChange={ numericFilterOnChange }
+        data-testid="comparison-filter"
+        value={ numericFilterLocalSettings.comparison }
+      >
+        <option>maior que</option>
+        <option>menor que</option>
+        <option>igual a</option>
+      </select>
+      <input
+        name="value"
+        value={ numericFilterLocalSettings.value }
+        onChange={ numericFilterOnChange }
+        data-testid="value-filter"
+        type="number"
+      />
+      <button
+        data-testid="button-filter"
+        type="submit"
+      >
+        Filtrar
+      </button>
+    </form>
   );
 }
 

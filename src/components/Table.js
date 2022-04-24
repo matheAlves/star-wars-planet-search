@@ -47,7 +47,7 @@ function Table() {
   }, [data, filterByNumericValues]);
 
   return (
-    <ul>
+    <div>
       { loading
         ? <Loading />
         : (
@@ -108,7 +108,7 @@ function Table() {
               )}
             </tbody>
           </table>)}
-    </ul>
+    </div>
   );
 }
 
