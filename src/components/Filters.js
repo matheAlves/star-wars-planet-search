@@ -18,8 +18,13 @@ function Filters() {
   }
 
   function localOnSubmit(e) {
+    const { column, comparison, value } = localSettings;
     e.preventDefault();
-    setNewNumericFilter(localSettings);
+    setNewNumericFilter(({
+      column,
+      comparison,
+      value,
+    }));
   }
 
   return (

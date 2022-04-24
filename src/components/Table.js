@@ -5,7 +5,6 @@ import Loading from './Loading';
 function Table() {
   const { data,
     loading,
-    setLoading,
     filterByName,
     filterByNumericValues } = useContext(PlanetsContext);
   const [filteredData, setFilteredData] = useState([]);
@@ -18,24 +17,23 @@ function Table() {
   }
 
   useEffect(() => {
-    function numericFilter() {
-      setLoading(true);
+    function filterRawData() {
       setFilteredData(data);
       filterByNumericValues.forEach((filter) => {
         const { column, value, comparison } = filter;
         switch (comparison) {
         case 'maior que':
-          setFilteredData(data.filter(
+          setFilteredData((prevData) => prevData.filter(
             (planet) => Number(planet[column]) > Number(value),
           ));
           break;
         case 'menor que':
-          setFilteredData(data.filter(
+          setFilteredData((prevData) => prevData.filter(
             (planet) => Number(planet[column]) < Number(value),
           ));
           break;
         case 'igual a':
-          setFilteredData(data.filter(
+          setFilteredData((prevData) => prevData.filter(
             (planet) => Number(planet[column]) === Number(value),
           ));
           break;
@@ -44,10 +42,9 @@ function Table() {
           break;
         }
       });
-      setLoading(false);
     }
-    numericFilter();
-  }, [data, filterByNumericValues, setLoading]);
+    filterRawData();
+  }, [data, filterByNumericValues]);
 
   return (
     <ul>
