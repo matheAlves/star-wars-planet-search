@@ -1,23 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PlanetsContext from './PlanetsContext';
-import fetchPlanets from '../services/swapi';
+import fetchPlanets from '../services/swApi';
 
 function PlanetsProvider({ children }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterByName, setFilterByName] = useState({ name: '' });
+  const [filterByNumericValues, setFilterByNumericValues] = useState([]);
 
   const getPlanets = async () => {
     setLoading(true);
     const planets = await fetchPlanets();
-    // if (filterByName.name.length) {
-    //   console.log('caiu aqui');
-    //   const filteredPlanets = planets.filter(
-    //     (planet) => planet.name.toLowerCase().includes(filterByName.name.toLowerCase()),
-    //   );
-    //   setData(filteredPlanets);
-    // }
     setData(planets);
     setLoading(false);
   };
@@ -29,16 +23,24 @@ function PlanetsProvider({ children }) {
     });
   };
 
+  function setNewNumericFilter(newFilterObject) {
+    setFilterByNumericValues((prevState) => [...prevState, newFilterObject]);
+    // setFilterByNumericValues([newFilterObject]);
+  }
+
   useEffect(() => {
     getPlanets();
   }, []);
 
   const contextValue = {
     loading,
+    setLoading,
     data,
     getPlanets,
     filterByName,
     onChangeName,
+    filterByNumericValues,
+    setNewNumericFilter,
   };
 
   return (
