@@ -1,16 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import PlanetsContext from '../context/PlanetsContext';
 import Loading from './Loading';
 
 function Table() {
   const { data,
-    loading,
     filterByName,
     filterByNumericValues,
     firstRender,
-    order } = useContext(PlanetsContext);
-
-  const [filteredData, setFilteredData] = useState(data);
+    order,
+    filteredData,
+    setNewFilteredData } = useContext(PlanetsContext);
 
   function orderList(list, orderFilter) {
     const { order: { column, sort } } = orderFilter;
@@ -60,7 +59,6 @@ function Table() {
   useEffect(() => {
     function filterByNumeric(list, numericFilters) {
       let filtered = list;
-      console.log(filtered);
       numericFilters.forEach((filter) => {
         const { column, value, comparison } = filter;
         switch (comparison) {
@@ -68,44 +66,48 @@ function Table() {
           filtered = filtered.filter(
             (planet) => (Number(planet[column]) > Number(value)),
           );
-          setFilteredData(filtered);
+          setNewFilteredData(filtered);
           break;
         case 'menor que':
           filtered = filtered.filter(
             (planet) => (Number(planet[column]) < Number(value)),
           );
-          setFilteredData(filtered);
+          if (order) {
+            const orderedList = orderList(filtered, order);
+            setNewFilteredData(orderedList);
+          } else setNewFilteredData(filtered);
+          setNewFilteredData(filtered);
           break;
         case 'igual a':
           filtered = filtered.filter(
             (planet) => (Number(planet[column]) === Number(value)),
           );
-          setFilteredData(filtered);
+          if (order) {
+            const orderedList = orderList(filtered, order);
+            setNewFilteredData(orderedList);
+          } else setNewFilteredData(filtered);
+          setNewFilteredData(filtered);
           break;
         default:
-          setFilteredData(filtered);
+          setNewFilteredData(filtered);
         }
       });
-      const orderedList = orderList(filteredData, order);
-      return orderedList;
     }
 
     function filterRawData() {
       if (firstRender) {
-        setFilteredData(data);
+        setNewFilteredData(data);
       } else {
-        const test = filterByNumeric(data, filterByNumericValues);
-        console.log(test);
-        setFilteredData(test);
+        filterByNumeric(filteredData, filterByNumericValues);
       }
     }
 
     filterRawData();
-  }, [data, filterByNumericValues, firstRender, order, filteredData]);
+  }, [data, filterByNumericValues, firstRender, order, filteredData, setNewFilteredData]);
 
   return (
     <div>
-      { loading
+      { data
         ? <Loading />
         : (
           <table>
@@ -127,7 +129,7 @@ function Table() {
               </tr>
             </thead>
             <tbody>
-              {filteredData.filter(
+              {data.filter(
                 (planet) => planet.name.toLowerCase().includes(
                   filterByName.name.toLowerCase(),
                 ),

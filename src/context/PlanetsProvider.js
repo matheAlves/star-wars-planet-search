@@ -9,6 +9,7 @@ function PlanetsProvider({ children }) {
   const [filterByName, setFilterByName] = useState({ name: '' });
   const [filterByNumericValues, setFilterByNumericValues] = useState([]);
   const [firstRender, setFirstRender] = useState(true);
+  const [filteredData, setFilteredData] = useState(data);
   const [columnOptions, setColumnOptions] = useState([
     'population', 'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
   const [filterOptions] = useState([
@@ -24,13 +25,16 @@ function PlanetsProvider({ children }) {
       sort: 'ASC',
     },
   }));
-
   const [order, setOrder] = useState(({
     order: {
       column: 'surface_water',
       sort: 'ASC',
     },
   }));
+
+  function setNewFilteredData(newFilteredData) {
+    setFilteredData(newFilteredData);
+  }
 
   function orderFilterOnChange({ target }) {
     switch (target.type) {
@@ -67,15 +71,6 @@ function PlanetsProvider({ children }) {
       [name]: value,
     }));
   }
-
-  const getPlanets = async () => {
-    setLoading(true);
-    const planets = await fetchPlanets();
-    // fonte https://stackoverflow.com/questions/6712034/sort-array-by-firstname-alphabetically-in-javascript
-    planets.sort((a, b) => a.name.localeCompare(b.name));
-    setData(planets);
-    setLoading(false);
-  };
 
   const onChangeName = ({ target }) => {
     const { value } = target;
@@ -118,8 +113,18 @@ function PlanetsProvider({ children }) {
   }
 
   useEffect(() => {
+    const getPlanets = async () => {
+      setLoading(true);
+      const planets = await fetchPlanets();
+      // fonte https://stackoverflow.com/questions/6712034/sort-array-by-firstname-alphabetically-in-javascript
+      planets.sort((a, b) => a.name.localeCompare(b.name));
+      setData(planets);
+      setFilteredData(data);
+      setLoading(false);
+      setFirstRender(false);
+    };
     getPlanets();
-  }, []);
+  }, [data]);
 
   const contextValue = {
     loading,
@@ -141,6 +146,8 @@ function PlanetsProvider({ children }) {
     setOrderFilter,
     firstRender,
     order,
+    filteredData,
+    setNewFilteredData,
   };
 
   return (
