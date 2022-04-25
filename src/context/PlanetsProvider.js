@@ -10,11 +10,48 @@ function PlanetsProvider({ children }) {
   const [filterByNumericValues, setFilterByNumericValues] = useState([]);
   const [columnOptions, setColumnOptions] = useState([
     'population', 'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
+  const [filterOptions, setFilterOptions] = useState([
+    'population', 'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
   const [numericFilterLocalSettings, setNumericFilterLocalSettings] = useState({
     column: 'population',
     comparison: 'maior que',
-    value: 0,
+    value: '',
   });
+  const [orderFilterLocalSettings, setOrderFilterLocalSettings] = useState(({
+    order: {
+      column: 'population',
+      sort: 'ASC',
+    },
+  }));
+
+  const [order, setOrder] = useState(({
+    order: {
+      column: 'population',
+      sort: 'ASC',
+    },
+  }));
+
+  function orderFilterOnChange({ target }) {
+    if (target.type === 'select-one') {
+      setOrderFilterLocalSettings((prevState) => ({
+        order: ({
+          column: target.value,
+          sort: prevState.order.sort,
+        }),
+      }));
+    } else {
+      setOrderFilterLocalSettings((prevState) => ({
+        order: ({
+          column: prevState.order.column,
+          sort: target.value,
+        }),
+      }));
+    }
+  }
+
+  function setOrderFilter() {
+    setOrder(orderFilterLocalSettings);
+  }
 
   function numericFilterOnChange({ target }) {
     const { name, value } = target;
@@ -40,6 +77,10 @@ function PlanetsProvider({ children }) {
 
   function setNewNumericFilter(newFilterObject) {
     setFilterByNumericValues((prevState) => [...prevState, newFilterObject]);
+    setNumericFilterLocalSettings((prevState) => ({
+      ...prevState,
+      value: '',
+    }));
   }
 
   function removeNumericFilter({ target }) {
@@ -54,6 +95,8 @@ function PlanetsProvider({ children }) {
 
   function clearNumericFilters() {
     setFilterByNumericValues([]);
+    setColumnOptions([
+      'population', 'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
   }
 
   function removeColumnOption(optionToRemove) {
@@ -84,6 +127,9 @@ function PlanetsProvider({ children }) {
     numericFilterLocalSettings,
     numericFilterOnChange,
     removeNumericFilter,
+    orderFilterOnChange,
+    filterOptions,
+    setOrderFilter,
   };
 
   return (
