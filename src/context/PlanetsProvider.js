@@ -42,9 +42,22 @@ function PlanetsProvider({ children }) {
     setFilterByNumericValues((prevState) => [...prevState, newFilterObject]);
   }
 
+  function removeNumericFilter({ target }) {
+    console.log(target.name);
+    const { name } = target;
+    const newFilterArray = filterByNumericValues.filter(
+      (filter) => filter.column !== name,
+    );
+    setFilterByNumericValues(newFilterArray);
+    setColumnOptions((prevState) => ([...prevState, name]));
+  }
+
+  function clearNumericFilters() {
+    setFilterByNumericValues([]);
+  }
+
   function removeColumnOption(optionToRemove) {
     const newOptions = columnOptions.filter((option) => option !== optionToRemove);
-    console.log(newOptions);
     setColumnOptions(newOptions);
     setNumericFilterLocalSettings((prevState) => ({
       ...prevState,
@@ -64,11 +77,13 @@ function PlanetsProvider({ children }) {
     filterByName,
     onChangeName,
     filterByNumericValues,
+    clearNumericFilters,
     setNewNumericFilter,
     columnOptions,
     removeColumnOption,
     numericFilterLocalSettings,
     numericFilterOnChange,
+    removeNumericFilter,
   };
 
   return (

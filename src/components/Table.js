@@ -7,6 +7,7 @@ function Table() {
     loading,
     filterByName,
     filterByNumericValues } = useContext(PlanetsContext);
+
   const [filteredData, setFilteredData] = useState([]);
 
   function nameFilter() {
