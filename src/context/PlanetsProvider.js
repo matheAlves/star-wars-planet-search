@@ -8,14 +8,15 @@ function PlanetsProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [filterByName, setFilterByName] = useState({ name: '' });
   const [filterByNumericValues, setFilterByNumericValues] = useState([]);
+  const [firstRender, setFirstRender] = useState(true);
   const [columnOptions, setColumnOptions] = useState([
     'population', 'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
-  const [filterOptions, setFilterOptions] = useState([
+  const [filterOptions] = useState([
     'population', 'orbital_period', 'diameter', 'rotation_period', 'surface_water']);
   const [numericFilterLocalSettings, setNumericFilterLocalSettings] = useState({
     column: 'population',
     comparison: 'maior que',
-    value: '',
+    value: 0,
   });
   const [orderFilterLocalSettings, setOrderFilterLocalSettings] = useState(({
     order: {
@@ -26,31 +27,37 @@ function PlanetsProvider({ children }) {
 
   const [order, setOrder] = useState(({
     order: {
-      column: 'population',
+      column: 'surface_water',
       sort: 'ASC',
     },
   }));
 
   function orderFilterOnChange({ target }) {
-    if (target.type === 'select-one') {
+    switch (target.type) {
+    case 'select-one':
       setOrderFilterLocalSettings((prevState) => ({
         order: ({
           column: target.value,
           sort: prevState.order.sort,
         }),
       }));
-    } else {
+      break;
+    case 'radio':
       setOrderFilterLocalSettings((prevState) => ({
         order: ({
           column: prevState.order.column,
           sort: target.value,
         }),
       }));
+      break;
+    default:
+      break;
     }
   }
 
   function setOrderFilter() {
     setOrder(orderFilterLocalSettings);
+    setFirstRender(false);
   }
 
   function numericFilterOnChange({ target }) {
@@ -64,6 +71,8 @@ function PlanetsProvider({ children }) {
   const getPlanets = async () => {
     setLoading(true);
     const planets = await fetchPlanets();
+    // fonte https://stackoverflow.com/questions/6712034/sort-array-by-firstname-alphabetically-in-javascript
+    planets.sort((a, b) => a.name.localeCompare(b.name));
     setData(planets);
     setLoading(false);
   };
@@ -130,6 +139,8 @@ function PlanetsProvider({ children }) {
     orderFilterOnChange,
     filterOptions,
     setOrderFilter,
+    firstRender,
+    order,
   };
 
   return (

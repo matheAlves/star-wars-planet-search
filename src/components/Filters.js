@@ -16,9 +16,8 @@ function Filters() {
     removeNumericFilter,
     setOrderFilter } = useContext(PlanetsContext);
 
-  function localOnSubmit(e) {
+  function localOnSubmit() {
     const { column, comparison, value } = numericFilterLocalSettings;
-    e.preventDefault();
     removeColumnOption(column);
     setNewNumericFilter(({
       column,
@@ -29,7 +28,7 @@ function Filters() {
 
   return (
     <>
-      <form onSubmit={ localOnSubmit }>
+      <form>
         <input
           name="search-by-name"
           data-testid="name-filter"
@@ -64,8 +63,9 @@ function Filters() {
           type="number"
         />
         <button
+          onClick={ localOnSubmit }
           data-testid="button-filter"
-          type="submit"
+          type="button"
         >
           Filtrar
         </button>
@@ -74,7 +74,7 @@ function Filters() {
         data-testid="column-sort"
         onChange={ orderFilterOnChange }
       >
-        Ordenar
+
         {filterOptions.map(
           (option) => <option value={ option } key={ option }>{option}</option>,
         )}
@@ -88,6 +88,7 @@ function Filters() {
           value="ASC"
           type="radio"
           id="ASC"
+          data-testid="column-sort-input-asc"
         />
       </label>
       <label htmlFor="DESC">
@@ -98,10 +99,12 @@ function Filters() {
           name="order"
           value="DESC"
           id="DESC"
+          data-testid="column-sort-input-desc"
         />
       </label>
       <button
-        onChange={ setOrderFilter }
+        onClick={ setOrderFilter }
+        data-testid="column-sort-button"
         type="button"
       >
         Ordenar

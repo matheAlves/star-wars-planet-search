@@ -6,46 +6,102 @@ function Table() {
   const { data,
     loading,
     filterByName,
-    filterByNumericValues } = useContext(PlanetsContext);
+    filterByNumericValues,
+    firstRender,
+    order } = useContext(PlanetsContext);
 
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState(data);
 
-  function nameFilter() {
-    const newData = filteredData.filter(
-      (planet) => planet.name.toLowerCase().includes(filterByName.name.toLowerCase()),
-    );
-    return newData;
+  function orderList(list, orderFilter) {
+    const { order: { column, sort } } = orderFilter;
+    const unknown = list.filter((planet) => planet[column] === 'unknown');
+    const known = list.filter((planet) => planet[column] !== 'unknown');
+
+    if (sort === 'ASC') {
+      const orderedKnown = known.sort((a, b) => a[column] - b[column]);
+      return [...orderedKnown, ...unknown];
+    } if (sort === 'DESC') {
+      const orderedKnown = known.sort((a, b) => b[column] - a[column]);
+      return [...orderedKnown, ...unknown];
+    }
   }
 
+  // function filterByNumeric(list, numericFilters) {
+  //   let filtered = list;
+  //   numericFilters.forEach((filter) => {
+  //     const { column, value, comparison } = filter;
+  //     switch (comparison) {
+  //     case 'maior que':
+  //       filtered = filtered.filter(
+  //         (planet) => (Number(planet[column]) > Number(value)),
+  //       );
+  //       setFilteredData(filtered);
+  //       break;
+  //     case 'menor que':
+  //       filtered = filtered.filter(
+  //         (planet) => (Number(planet[column]) < Number(value)),
+  //       );
+  //       setFilteredData(filtered);
+  //       break;
+  //     case 'igual a':
+  //       filtered = filtered.filter(
+  //         (planet) => (Number(planet[column]) === Number(value)),
+  //       );
+  //       setFilteredData(filtered);
+  //       break;
+  //     default:
+  //       setFilteredData(filtered);
+  //     }
+  //   });
+  //   const orderedList = orderList(filteredData, order);
+  //   return orderedList;
+  // }
+
   useEffect(() => {
-    function filterRawData() {
-      setFilteredData(data);
-      filterByNumericValues.forEach((filter) => {
+    function filterByNumeric(list, numericFilters) {
+      let filtered = list;
+      console.log(filtered);
+      numericFilters.forEach((filter) => {
         const { column, value, comparison } = filter;
         switch (comparison) {
         case 'maior que':
-          setFilteredData((prevData) => prevData.filter(
-            (planet) => Number(planet[column]) > Number(value),
-          ));
+          filtered = filtered.filter(
+            (planet) => (Number(planet[column]) > Number(value)),
+          );
+          setFilteredData(filtered);
           break;
         case 'menor que':
-          setFilteredData((prevData) => prevData.filter(
-            (planet) => Number(planet[column]) < Number(value),
-          ));
+          filtered = filtered.filter(
+            (planet) => (Number(planet[column]) < Number(value)),
+          );
+          setFilteredData(filtered);
           break;
         case 'igual a':
-          setFilteredData((prevData) => prevData.filter(
-            (planet) => Number(planet[column]) === Number(value),
-          ));
+          filtered = filtered.filter(
+            (planet) => (Number(planet[column]) === Number(value)),
+          );
+          setFilteredData(filtered);
           break;
         default:
-          setFilteredData(data);
-          break;
+          setFilteredData(filtered);
         }
       });
+      const orderedList = orderList(filteredData, order);
+      return orderedList;
     }
+
+    function filterRawData() {
+      if (firstRender) {
+        setFilteredData(data);
+      } else {
+        const test = filterByNumeric(data, filterByNumericValues);
+        console.log(test);
+        setFilteredData(test);
+      }
+    }
+
     filterRawData();
-  }, [data, filterByNumericValues]);
+  }, [data, filterByNumericValues, firstRender, order, filteredData]);
 
   return (
     <div>
@@ -71,7 +127,11 @@ function Table() {
               </tr>
             </thead>
             <tbody>
-              {nameFilter().map(
+              {filteredData.filter(
+                (planet) => planet.name.toLowerCase().includes(
+                  filterByName.name.toLowerCase(),
+                ),
+              ).map(
                 (planet) => {
                   const {
                     name,
@@ -90,7 +150,11 @@ function Table() {
                   } = planet;
                   return (
                     <tr key={ name }>
-                      <td>{name}</td>
+                      <td
+                        data-testid="planet-name"
+                      >
+                        {name}
+                      </td>
                       <td>{rotationPeriod}</td>
                       <td>{orbitalPeriod}</td>
                       <td>{diameter}</td>
